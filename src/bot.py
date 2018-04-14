@@ -35,8 +35,8 @@ def get_json_from_url(url):
     js = json.loads(content)
     return js
 
-def get_updates(URL, offset=None):
-    url = URL + "getUpdates?timeout=10"
+def get_updates(URL, offset=None, to = 60):
+    url = URL + "getUpdates?timeout={}".format(to)
     if offset:
         url += "&offset={}".format(offset)
     js = get_json_from_url(url)
@@ -76,7 +76,8 @@ def bot_responses(updates, URL, token):
             print("Shutting down bot...")
             pass
         if message_text == '/arb':
-            arbval = np.round(arb.get_btc_arb(), 5) * 100
+            arbval, zarusd = arb.get_btc_arb()
+            arbval = np.round(arbval, 5) * 100
             send_message("Current arb is {a}%".format(a=arbval), chat_id, URL)
             pass
         if message_text == '/arbplot':
@@ -85,26 +86,35 @@ def bot_responses(updates, URL, token):
             pass
     return RunBot
 
-def check_arb(tdiff, start_time, base_chat_id, URL):
+def check_arb(tdiff, start_time, base_chat_id, URL, db):
     CT = datetime.datetime.now()
     if (tdiff.seconds > 60):
-        arbval = np.round(arb.get_btc_arb(), 5) * 100
-        print("Checking ARB, current val: {}%".format(arbval))
-        if arbval >= 5.00:
+        arbval, zarusd = np.round(arb.get_btc_arb(), 5)
+        print("Checking ARB, current val: {}%".format(arbval*100))
+        if arbval*100 >= 5.00:
             print("ARB is greater than 5%")
             send_message("ARB is greater than 5%, current arb is {a}%".format(a=arbval), base_chat_id, URL)
         start_time = datetime.datetime.now()
+        db.add_arb(start_time, arbval, zarusd)
+
+
     return start_time
 
-def MM(morning_message, base_chat_id, URL):
+def good_morning(morning_message, base_chat_id, URL):
     CT = datetime.datetime.now()
     MorningTime = CT.replace(hour=7, minute=30, second=0)
     if morning_message == False and CT >= MorningTime:
-        arbval = np.round(arb.get_btc_arb(), 5) * 100
+        arbval, zarusd = np.round(arb.get_btc_arb(), 5)
         send_message("Good morning Chris", base_chat_id, URL)
-        send_message("Current arb is {a}%".format(a=arbval), base_chat_id, URL)
-        print("It is later than 7h30 and we have sent the MM")
+        send_message("Current arb is {a}%".format(a=arbval*100), base_chat_id, URL)
+        send_message("Current ZAR/USD FX rate is {a}".format(a=zarusd), base_chat_id, URL)
+        print("It is later than 7h30 and we have sent the morning message")
         morning_message = True
     if CT <= MorningTime:
         morning_message = False
     return morning_message
+
+def build_keyboard(items):
+    keyboard = [[item] for item in items]
+    reply_markup = {"keyboard":keyboard, "one_time_keyboard": True}
+    return json.dumps(reply_markup)

@@ -35,5 +35,5 @@ def get_btc_arb(AMT = 30000, graph = False):
         DIFF_VEC = np.array(AMT_D_VEC) - np.array(AMT_VEC)
         ARB_VEC = DIFF_VEC / AMT_VEC
         plt.plot(AMT_VEC, ARB_VEC)
-        plt.savefig('images/ARB_BTC')
-    return(ARB)
+        plt.savefig('images/ARB_BTC.png')
+    return ARB, zarusd

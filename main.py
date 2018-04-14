@@ -10,6 +10,8 @@ import thread
 import numpy as np
 import requests
 import src.arb as arb
+import socket
+from src.dbhelper import DBHelper
 
 init.initialise_project()
 
@@ -22,11 +24,23 @@ base_chat_id = config.get("configuration","base_chat_id")
 
 URL = "https://api.telegram.org/bot{}/".format(token)
 
+MachineName = socket.gethostname()
+if MachineName == 'raspberrypi':
+    RaspPi = True
+    db_directory = '~/mnt/FLASH/db/'
+else:
+    RaspPi = False
+    db_directory = 'data/'
+
+db = DBHelper("PyBot_DB.sqlite",db_directory)
+
 def main():
     last_update_id = None
     start_time = datetime.datetime.now()
     RunBot = True
     morningMessage = False
+
+    db.setup()
 
     print("Listening...")
     while RunBot:
@@ -36,9 +50,8 @@ def main():
 
         tdiff = datetime.datetime.now() - start_time
         RunBot = src_bot.bot_responses(updates, URL, token)
-        start_time = src_bot.check_arb(tdiff, start_time, base_chat_id, URL)
-        morningMessage = src_bot.MM(morningMessage, base_chat_id, URL)
-
+        start_time = src_bot.check_arb(tdiff, start_time, base_chat_id, URL, db)
+        morningMessage = src_bot.good_morning(morningMessage, base_chat_id, URL)
 
         time.sleep(3)
 

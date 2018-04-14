@@ -1,19 +1,18 @@
 import sqlite3
 
-class DBHelper:
-    def __init__(self, dbname="todo.sqlite"):
+class DBHelper():
+    def __init__(self, dbname="bot_db.sqlite", db_dir = "data/"):
         self.dbname = dbname
-        self.conn = sqlite3.connect(dbname)
+        self.conn = sqlite3.connect(db_dir + dbname)
 
     def setup(self):
-        print("creating table")
-        stmt = "CREATE TABLE IF NOT EXISTS items (description text, owner text)"
+        stmt = "CREATE TABLE IF NOT EXISTS arb (time text, arb real, zarusd real)"
         self.conn.execute(stmt)
         self.conn.commit()
 
-    def add_item(self, item_text, owner):
-        stmt = "INSERT INTO items (description, owner) VALUES (?, ?)"
-        args = (item_text, owner)
+    def add_arb(self, time, arb, zarusd):
+        stmt = "INSERT INTO arb (time, arb, zarusd) VALUES (?, ?, ?)"
+        args = (time, arb, zarusd)
         self.conn.execute(stmt, args)
         self.conn.commit()
 
