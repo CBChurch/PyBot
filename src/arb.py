@@ -36,6 +36,4 @@ def get_btc_arb(AMT = 30000, graph = False):
         ARB_VEC = DIFF_VEC / AMT_VEC
         plt.plot(AMT_VEC, ARB_VEC)
         plt.savefig('images/ARB_BTC')
-
-
     return(ARB)

@@ -9,47 +9,40 @@ import datetime
 import thread
 import numpy as np
 import requests
-import urllib
 import src.arb as arb
 
 init.initialise_project()
 
+global updates, chat_id
+
 config = ConfigParser.ConfigParser()
 config.read("./config/cred.config")
 token = config.get("configuration","RaspPy")
-URL = "https://api.telegram.org/bot{}/".format(token)
-base_chat_id = '419194191'
+base_chat_id = config.get("configuration","base_chat_id")
 
+URL = "https://api.telegram.org/bot{}/".format(token)
 
 def main():
     last_update_id = None
     start_time = datetime.datetime.now()
-    print("Listening...")
     RunBot = True
+    morningMessage = False
+
+    print("Listening...")
     while RunBot:
         updates = src_bot.get_updates(URL, last_update_id)
         if len(updates["result"]) > 0:
-            message_text = updates["result"][0]["message"]["text"]
-            chat_id = updates["result"][0]["message"]["from"]["id"]
-            if message_text == '/stop':
-                RunBot = False
-                print("Shutting down bot...")
-                pass
-            if message_text == '/arb':
-                arb_val = arb.get_btc_arb()
-                src_bot.send_message(arb_val, chat_id, URL)
-                pass
-            if message_text == '/arbplot':
-                arb.get_btc_arb(graph=True)
-                src_bot.sendImage(chat_id, 'images/ARB_BTC.png',token)
-
             last_update_id = src_bot.get_last_update_id(updates) + 1
-            # src_bot.echo_all(updates, URL)
-        timediff = datetime.datetime.now()-start_time
-        print(timediff.seconds)
-        print("hello world")
+
+        tdiff = datetime.datetime.now() - start_time
+        RunBot = src_bot.bot_responses(updates, URL, token)
+        start_time = src_bot.check_arb(tdiff, start_time, base_chat_id, URL)
+        morningMessage = src_bot.MM(morningMessage, base_chat_id, URL)
+
+
         time.sleep(3)
 
 
 if __name__ == '__main__':
     main()
+
