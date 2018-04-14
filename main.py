@@ -27,7 +27,7 @@ URL = "https://api.telegram.org/bot{}/".format(token)
 MachineName = socket.gethostname()
 if MachineName == 'raspberrypi':
     RaspPi = True
-    db_directory = '~/mnt/FLASH/db/'
+    db_directory = '/mnt/FLASH/db/'
 else:
     RaspPi = False
     db_directory = 'data/'
