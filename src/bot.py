@@ -76,8 +76,8 @@ def bot_responses(updates, URL, token):
             print("Shutting down bot...")
             pass
         if message_text == '/arb':
-            arbval = arb.get_btc_arb()
-            send_message("ARB is greater than 5%, current arb is {a}%".format(a=arbval), chat_id, URL)
+            arbval = np.round(arb.get_btc_arb(), 5) * 100
+            send_message("Current arb is {a}%".format(a=arbval), chat_id, URL)
             pass
         if message_text == '/arbplot':
             arb.get_btc_arb(graph=True)
@@ -87,7 +87,7 @@ def bot_responses(updates, URL, token):
 
 def check_arb(tdiff, start_time, base_chat_id, URL):
     CT = datetime.datetime.now()
-    if (tdiff.seconds > 10):
+    if (tdiff.seconds > 60):
         arbval = np.round(arb.get_btc_arb(), 5) * 100
         print("Checking ARB, current val: {}%".format(arbval))
         if arbval >= 5.00:
@@ -100,7 +100,9 @@ def MM(morning_message, base_chat_id, URL):
     CT = datetime.datetime.now()
     MorningTime = CT.replace(hour=7, minute=30, second=0)
     if morning_message == False and CT >= MorningTime:
+        arbval = np.round(arb.get_btc_arb(), 5) * 100
         send_message("Good morning Chris", base_chat_id, URL)
+        send_message("Current arb is {a}%".format(a=arbval), base_chat_id, URL)
         print("It is later than 7h30 and we have sent the MM")
         morning_message = True
     if CT <= MorningTime:
