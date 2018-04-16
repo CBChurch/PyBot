@@ -1,28 +1,15 @@
-import sys
+#Import libraries
 import ConfigParser
 import time
-from telepot.loop import MessageLoop
-import telepot
 import src.bot as src_bot
 import src.init as init
 import datetime
-import thread
-import numpy as np
-import requests
-import src.arb as arb
 import socket
 from src.dbhelper import DBHelper
+import src.arb as src_arb
 
+#Initialise project
 init.initialise_project()
-
-global updates, chat_id
-
-config = ConfigParser.ConfigParser()
-config.read("./config/cred.config")
-token = config.get("configuration","RaspPy")
-base_chat_id = config.get("configuration","base_chat_id")
-
-URL = "https://api.telegram.org/bot{}/".format(token)
 
 MachineName = socket.gethostname()
 if MachineName == 'raspberrypi':
@@ -31,9 +18,17 @@ if MachineName == 'raspberrypi':
 else:
     RaspPi = False
     db_directory = 'data/'
-
 db = DBHelper("PyBot_DB.sqlite",db_directory)
 
+#Collect configuration items
+config = ConfigParser.ConfigParser()
+config.read("./config/cred.config")
+token = config.get("configuration","RaspPy")
+base_chat_id = config.get("configuration","base_chat_id")
+
+URL = "https://api.telegram.org/bot{}/".format(token)
+
+#Define main program
 def main():
     last_update_id = None
     start_time = datetime.datetime.now()
@@ -49,13 +44,14 @@ def main():
             last_update_id = src_bot.get_last_update_id(updates) + 1
 
         tdiff = datetime.datetime.now() - start_time
-        RunBot = src_bot.bot_responses(updates, URL, token)
+        RunBot = src_bot.bot_responses(updates, URL, token, db)
         start_time = src_bot.check_arb(tdiff, start_time, base_chat_id, URL, db)
-        morningMessage = src_bot.good_morning(morningMessage, base_chat_id, URL)
+        morningMessage = src_bot.good_morning(morningMessage, base_chat_id, URL, token, db)
+        time.sleep(0.5)
+        #RunBot = False
 
-        time.sleep(3)
 
-
+#Run program
 if __name__ == '__main__':
     main()
 
