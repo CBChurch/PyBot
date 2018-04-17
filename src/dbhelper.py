@@ -1,4 +1,5 @@
 import sqlite3
+import pandas as pd
 
 class DBHelper():
     def __init__(self, dbname="bot_db.sqlite", db_dir = "data/"):
@@ -34,7 +35,5 @@ class DBHelper():
         return schema, values
 
     def get_last_24_hours(self):
-        stmt = "SELECT * FROM arb WHERE date >= datetime('now','localtime','-1days') "
-        schema = self.conn.cursor().execute("PRAGMA table_info(arb)").fetchall()
-        values = self.conn.execute(stmt).fetchall()
-        return schema, values
+        df = pd.read_sql_query("SELECT * FROM arb WHERE time >= datetime('now','localtime','-1 days')", self.conn)
+        return df

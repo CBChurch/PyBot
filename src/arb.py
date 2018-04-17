@@ -2,8 +2,10 @@ from forex_python.converter import CurrencyRates
 import ccxt
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from time import sleep as sleep
 import datetime
+import matplotlib.dates as mdates
 
 def get_zar_usd():
     c = CurrencyRates()
@@ -59,7 +61,6 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
         ymin = np.min([luno_btc_arb, ice3x_btc_arb, ice3x_ltc_arb])
 
         plt.clf()
-        fig = plt.figure()
         plt.plot(AMT_VEC, LUNO_BTC_VEC)
         plt.plot(AMT_VEC, ICE3X_BTC_VEC)
         plt.plot(AMT_VEC, ICE3X_LTC_VEC)
@@ -78,6 +79,7 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
         plt.grid(which='both')
         #plt.show()
         plt.savefig('images/ARB.png')
+        plt.close()
 
     if plt_rev_arb:
         AMT_VEC = range(0, 35000, 100)
@@ -90,7 +92,6 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
         ymin = np.min([luno_btc_revarb, ice3x_btc_revarb, ice3x_ltc_revarb])
 
         plt.clf()
-        fig = plt.figure()
         plt.plot(AMT_VEC, LUNO_BTC_REV_VEC)
         plt.plot(AMT_VEC, ICE3X_BTC_REV_VEC)
         plt.plot(AMT_VEC, ICE3X_LTC_REV_VEC)
@@ -110,6 +111,7 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
         plt.grid(which='both')
         #plt.show()
         plt.savefig('images/REV_ARB.png')
+        plt.close()
 
     return luno_btc_arb, ice3x_btc_arb, ice3x_ltc_arb, luno_btc_revarb, ice3x_btc_revarb, ice3x_ltc_revarb, zarusd
 
@@ -172,3 +174,30 @@ def get_btc_arb(AMT = 30000, graph = False):
         #plt.savefig('images/ARB_BTC.png')
         plt.show()
     return ARB, zarusd, rev_arb
+
+
+def plt_last_24_hours(db):
+    df = db.get_last_24_hours()
+    df['time'] = pd.to_datetime(df['time'])
+    df['time'] = df['time'].apply(lambda x: datetime.datetime.time(x))
+    #df['time'] = df['time'].apply(lambda x: datetime.datetime.strftime(x, '%H:%M'))
+    #df['mdate'] = [mdates.date2num(d) for d in df['time']]
+    #df['mdate'] = [mdates.num2date(d) for d in df['mdate']]
+
+    plt.clf()
+    plt.plot(df['time'], df['luno_btc_arb'])
+    #plt.plot(df['time'], df['luno_btc_arb'],'p')
+    #plt.axhline(y=0, color='dimgray')
+    #plt.axvline(x=0, color='dimgray')
+
+    #plt.xlabel('Time')
+    #plt.ylabel('ARB')
+    #plt.grid(which='both')
+    #plt.format_xdata = mdates.DateFormatter('%Y-%m-%d')
+
+    plt.show()
+    plt.savefig('images/LAST_24.png')
+
+    plt.close()
+
+

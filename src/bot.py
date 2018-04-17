@@ -1,7 +1,7 @@
 import requests
 import numpy as np
 import datetime
-import arb
+import arb as src_arb
 import json
 import furl.furl as furl
 import dateutil.parser as dt_parser
@@ -13,9 +13,9 @@ def handle_func(msg, bot, token):
     print 'Got command: %s' % command
 
     if command == '/arb':
-        bot.sendMessage(chat_id, str(np.round(arb.get_btc_arb()*100,3)))
+        bot.sendMessage(chat_id, str(np.round(src_arb.get_btc_arb()*100,3)))
     elif command == '/arbplot':
-        arb.get_btc_arb(graph=True)
+        src_arb.get_btc_arb(graph=True)
         sendImage(chat_id, 'images/ARB_BTC.png', token)
     pass
 
@@ -38,7 +38,7 @@ def get_json_from_url(url):
     return js
 
 def get_updates(URL, offset=None, to = 100):
-    url = URL + "getUpdates?timeout={}".format(to)
+    url = URL + "getUpdates?timeout={t}".format(t=to)
     if offset:
         url += "&offset={}".format(offset)
     js = get_json_from_url(url)
@@ -91,6 +91,12 @@ def bot_responses(updates, URL, token, db):
             #arb.get_btc_arb(graph=True)
             sendImage(chat_id, 'images/REV_ARB.png', token)
             pass
+
+        if message_text == '/plot24':
+            src_arb.plt_last_24_hours(db)
+            sendImage(chat_id, 'images/LAST_24.png', token)
+            pass
+
         if message_text == '/checkdb':
             schema, db_vals = db.get_latest_arb()
             db_vals = db_vals[0]
@@ -113,7 +119,7 @@ def check_arb(tdiff, start_time, base_chat_id, URL, db):
     CT = datetime.datetime.now()
     if (tdiff.seconds > 60):
         #arbval, zarusd, revarb = np.round(arb.get_btc_arb(), 5)
-        vals = arb.get_crypto_arb(plt_rev_arb=True, plt_results=True)
+        vals = src_arb.get_crypto_arb(plt_rev_arb=True, plt_results=True)
 
         luno_btc_arb = vals[0]
         ice3x_btc_arb = vals[1]

@@ -38,8 +38,8 @@ def main():
     db.setup()
 
     print("Listening...")
+    try_count = 0
     while RunBot:
-        try_count = 0
         try:
             updates = src_bot.get_updates(URL, last_update_id)
             if len(updates["result"]) > 0:
@@ -49,11 +49,12 @@ def main():
             RunBot = src_bot.bot_responses(updates, URL, token, db)
             start_time = src_bot.check_arb(tdiff, start_time, base_chat_id, URL, db)
             morningMessage = src_bot.good_morning(morningMessage, base_chat_id, URL, token, db)
-            time.sleep(0.5)
+            time.sleep(2)
             #RunBot = False
             try_count = 0
         except:
             try_count += 1
+            print updates
             print("Bot has failed {n} times".format(n=try_count))
             if try_count >= 10:
                 src_bot.send_message("Bot failed 10 times in a row", chat_id=base_chat_id, URL=URL)
