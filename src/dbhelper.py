@@ -32,3 +32,9 @@ class DBHelper():
         schema = self.conn.cursor().execute("PRAGMA table_info(arb)").fetchall()
         values = self.conn.execute(stmt).fetchall()
         return schema, values
+
+    def get_last_24_hours(self):
+        stmt = "SELECT * FROM arb WHERE date >= datetime('now','localtime','-1days') "
+        schema = self.conn.cursor().execute("PRAGMA table_info(arb)").fetchall()
+        values = self.conn.execute(stmt).fetchall()
+        return schema, values

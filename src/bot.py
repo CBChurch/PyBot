@@ -152,13 +152,14 @@ def good_morning(morning_message, base_chat_id, URL, token, db):
         revarbpos = np.argmax(db_vals[5:]) + 5
         revarb_prod = schema[revarbpos][1]
 
-        send_message("Good morning Chris", base_chat_id, URL)
-        send_message("Current arb is: {a}% for {p}.".format(a=arb, p = arb_prod), base_chat_id, URL)
-        send_message('The reverse arb is: {r}% for {p}'.format(r = revarb, p = revarb_prod), base_chat_id, URL)
-        send_message("Current ZAR/USD FX rate is {a}".format(a=zarusd), base_chat_id, URL)
-        send_message("The data was stored into the DB at {t} on {dt}".format(t=t.time().strftime('%H:%M'), dt = t.date()), base_chat_id, URL)
-        sendImage(base_chat_id, 'images/ARB.png', token)
-        sendImage(base_chat_id, 'images/REV_ARB.png', token)
+        send_message("Good morning Chris, the current arb is: {a}% for {p}. The reverse arb is: {r}% for {rp}."
+                     "The current ZAR/USD FX rate is {fx}. The data was stored into the DB at {t} on {dt}."
+                     .format(a=arb, p = arb_prod, r = revarb, rp = revarb_prod, fx=zarusd,
+                             t=t.time().strftime('%H:%M'), dt=t.date()), base_chat_id, URL)
+        if arb > 0:
+            sendImage(base_chat_id, 'images/ARB.png', token)
+        if revarb > 0:
+            sendImage(base_chat_id, 'images/REV_ARB.png', token)
         print("It is later than 7h30 and we have sent the morning message.")
         morning_message = True
     if CT <= MorningTime and morning_message == True:
