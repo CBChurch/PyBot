@@ -180,22 +180,17 @@ def plt_last_24_hours(db):
     df = db.get_last_24_hours()
     df['time'] = pd.to_datetime(df['time'])
     df['time'] = df['time'].apply(lambda x: datetime.datetime.time(x))
-    #df['time'] = df['time'].apply(lambda x: datetime.datetime.strftime(x, '%H:%M'))
-    #df['mdate'] = [mdates.date2num(d) for d in df['time']]
-    #df['mdate'] = [mdates.num2date(d) for d in df['mdate']]
 
     plt.clf()
     plt.plot(df['time'], df['luno_btc_arb'])
-    #plt.plot(df['time'], df['luno_btc_arb'],'p')
-    #plt.axhline(y=0, color='dimgray')
-    #plt.axvline(x=0, color='dimgray')
+    plt.plot(df['time'], df['luno_btc_arb'],'p')
+    plt.axhline(y=0, color='dimgray')
 
-    #plt.xlabel('Time')
-    #plt.ylabel('ARB')
-    #plt.grid(which='both')
-    #plt.format_xdata = mdates.DateFormatter('%Y-%m-%d')
+    plt.xlabel('Time')
+    plt.ylabel('ARB')
+    plt.grid(which='both')
 
-    plt.show()
+    #plt.show()
     plt.savefig('images/LAST_24.png')
 
     plt.close()
