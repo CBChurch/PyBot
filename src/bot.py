@@ -24,12 +24,14 @@ def sendImage(chat_id, image_path, token):
     files = {'photo': open(image_path, 'rb')}
     data = {'chat_id' : chat_id}
     r= requests.post(url, files=files, data=data)
+    r.close()
     #print(r.status_code, r.reason, r.content)
     pass
 
 def get_url(url):
     response = requests.get(url)
     content = response.content.decode("utf8")
+    response.close()
     return content
 
 def get_json_from_url(url):

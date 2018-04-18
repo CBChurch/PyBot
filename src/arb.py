@@ -180,6 +180,7 @@ def plt_last_24_hours(db):
     df = db.get_last_24_hours()
     df['time'] = pd.to_datetime(df['time'])
     df['time'] = df['time'].apply(lambda x: datetime.datetime.time(x))
+    df = df.sort_values(by=['time'])
 
     plt.clf()
     plt.plot(df['time'], df['luno_btc_arb'])
