@@ -5,11 +5,13 @@ import src.bot as src_bot
 import src.init as init
 import datetime
 import socket
+import logging
 from src.dbhelper import DBHelper
 import src.arb as src_arb
 
 #Initialise project
 init.initialise_project()
+logging.basicConfig(filename='/mnt/FLASH/logs/PyBot.log',level=logging.DEBUG)
 
 MachineName = socket.gethostname()
 if MachineName == 'raspberrypi':
@@ -52,7 +54,8 @@ def main():
             time.sleep(2)
             #RunBot = False
             try_count = 0
-        except:
+        except Exception as e:
+            logging.debug(str(e))
             try_count += 1
             print updates
             print("Bot has failed {n} times".format(n=try_count))

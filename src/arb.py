@@ -1,5 +1,7 @@
 from forex_python.converter import CurrencyRates
 import ccxt
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -177,6 +179,8 @@ def get_btc_arb(AMT = 30000, graph = False):
 
 
 def plt_last_24_hours(db):
+    #CT = datetime.datetime.now()
+
     df = db.get_last_24_hours()
     df['time'] = pd.to_datetime(df['time'])
     df['time'] = df['time'].apply(lambda x: datetime.datetime.time(x))
@@ -186,6 +190,9 @@ def plt_last_24_hours(db):
     plt.plot(df['time'], df['luno_btc_arb'])
     plt.plot(df['time'], df['luno_btc_arb'],'p')
     plt.axhline(y=0, color='dimgray')
+    #plt.text(35000 / 2, ymax + 0.015, str(CT.strftime('%Y-%m-%d %H:%M')), fontsize=12,
+    #         bbox=dict(facecolor='red', alpha=0.5), horizontalalignment='center',
+    #         verticalalignment='center')
 
     plt.xlabel('Time')
     plt.ylabel('ARB')
