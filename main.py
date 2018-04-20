@@ -18,7 +18,7 @@ MachineName = socket.gethostname()
 if MachineName == 'raspberrypi':
     RaspPi = True
     db_directory = '/mnt/FLASH/db/'
-    logging.basicConfig(filename='/mnt/FLASH/logs/PyBot.log', level=logging.DEBUG)
+    logging.basicConfig(filename='/mnt/FLASH/logs/PyBot_Internal.log', level=logging.DEBUG)
 else:
     RaspPi = False
     db_directory = 'data/'

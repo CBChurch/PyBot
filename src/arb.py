@@ -1,6 +1,7 @@
 from forex_python.converter import CurrencyRates
 import ccxt
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,9 +9,11 @@ import pandas as pd
 from time import sleep as sleep
 import datetime
 
+
 def get_zar_usd():
     c = CurrencyRates()
-    return(c.get_rate('USD','ZAR'))
+    return (c.get_rate('USD', 'ZAR'))
+
 
 def get_ticker_rates(ex=ccxt.bitstamp(), tickers=np.array(['BTC/USD', 'LTC/USD'])):
     rates = []
@@ -20,8 +23,8 @@ def get_ticker_rates(ex=ccxt.bitstamp(), tickers=np.array(['BTC/USD', 'LTC/USD']
         sleep(2)
     return rates
 
-def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
 
+def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
     CT = datetime.datetime.now()
 
     luno = ccxt.luno()
@@ -39,7 +42,6 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
     bitstamp_rates = get_ticker_rates(bitstamp, bitstamp_tickers)
     ice3x_rates = get_ticker_rates(ice3x, ice3x_tickers)
 
-
     luno_btc_arb = calc_arb(AMT, luno_rates[0]['bid'], bitstamp_rates[0]['ask'], usdzar)
 
     ice3x_btc_arb = calc_arb(AMT, ice3x_rates[0]['last'], bitstamp_rates[0]['ask'], usdzar)
@@ -49,9 +51,8 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
     ice3x_btc_revarb = calc_rev_arb(ASK=ice3x_rates[0]['last'], BID=bitstamp_rates[0]['bid'], BASE=zarusd)
     ice3x_ltc_revarb = calc_rev_arb(ASK=ice3x_rates[1]['last'], BID=bitstamp_rates[1]['bid'], BASE=zarusd)
 
-    #print('The ARB ratio is: {}'.format(luno_btc_arb))
-    #print luno_btc_arb, ice3x_btc_arb, ice3x_ltc_arb, luno_btc_revarb, ice3x_btc_revarb, ice3x_ltc_revarb
-
+    # print('The ARB ratio is: {}'.format(luno_btc_arb))
+    # print luno_btc_arb, ice3x_btc_arb, ice3x_ltc_arb, luno_btc_revarb, ice3x_btc_revarb, ice3x_ltc_revarb
 
     if plt_results:
         AMT_VEC = range(0, 35000, 100)
@@ -73,23 +74,27 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
                     'ICE3X_BTC: ' + str(np.round(ice3x_btc_arb * 100, 4)) + '%',
                     'ICE3X_LTC: ' + str(np.round(ice3x_ltc_arb * 100, 4)) + '%'],
                    loc='lower right')
-        plt.ylim((ymin-0.03, ymax + 0.02))
-        plt.text(35000/2,ymax+0.015,str(CT.strftime('%Y-%m-%d %H:%M')), fontsize = 12, bbox=dict(facecolor='red', alpha=0.5), horizontalalignment='center',
+        plt.ylim((ymin - 0.03, ymax + 0.02))
+        plt.text(35000 / 2, ymax + 0.015, str(CT.strftime('%Y-%m-%d %H:%M')), fontsize=12,
+                 bbox=dict(facecolor='red', alpha=0.5), horizontalalignment='center',
                  verticalalignment='center')
         plt.title('ARB Comparison')
         plt.xlabel('ZAR')
         plt.ylabel('Arb %')
         plt.grid(which='both')
-        #plt.show()
+        # plt.show()
         plt.savefig('images/ARB.png')
         plt.close()
 
     if plt_rev_arb:
         AMT_VEC = range(0, 35000, 100)
 
-        LUNO_BTC_REV_VEC = [calc_rev_arb(ASK=luno_rates[0]['ask'], BID=bitstamp_rates[0]['bid'], AMT = x, BASE=zarusd) for x in AMT_VEC]
-        ICE3X_BTC_REV_VEC = [calc_rev_arb(ASK=ice3x_rates[0]['last'], BID=bitstamp_rates[0]['bid'], AMT=x, BASE=zarusd) for x in AMT_VEC]
-        ICE3X_LTC_REV_VEC = [calc_rev_arb(ASK=ice3x_rates[1]['last'], BID=bitstamp_rates[1]['bid'], AMT=x, BASE=zarusd) for x in AMT_VEC]
+        LUNO_BTC_REV_VEC = [calc_rev_arb(ASK=luno_rates[0]['ask'], BID=bitstamp_rates[0]['bid'], AMT=x, BASE=zarusd) for
+                            x in AMT_VEC]
+        ICE3X_BTC_REV_VEC = [calc_rev_arb(ASK=ice3x_rates[0]['last'], BID=bitstamp_rates[0]['bid'], AMT=x, BASE=zarusd)
+                             for x in AMT_VEC]
+        ICE3X_LTC_REV_VEC = [calc_rev_arb(ASK=ice3x_rates[1]['last'], BID=bitstamp_rates[1]['bid'], AMT=x, BASE=zarusd)
+                             for x in AMT_VEC]
 
         ymax = np.max([luno_btc_revarb, ice3x_btc_revarb, ice3x_ltc_revarb])
         ymin = np.min([luno_btc_revarb, ice3x_btc_revarb, ice3x_ltc_revarb])
@@ -100,19 +105,19 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
         plt.plot(AMT_VEC, ICE3X_LTC_REV_VEC)
         plt.axhline(y=0, color='dimgray')
         plt.axvline(x=0, color='dimgray')
-        plt.legend(['LUNO_BTC: '+str(np.round(luno_btc_revarb*100,4))+'%',
-                    'ICE3X_BTC: '+str(np.round(ice3x_btc_revarb*100,4))+'%',
-                    'ICE3X_LTC: '+str(np.round(ice3x_ltc_revarb*100,4))+'%'],
+        plt.legend(['LUNO_BTC: ' + str(np.round(luno_btc_revarb * 100, 4)) + '%',
+                    'ICE3X_BTC: ' + str(np.round(ice3x_btc_revarb * 100, 4)) + '%',
+                    'ICE3X_LTC: ' + str(np.round(ice3x_ltc_revarb * 100, 4)) + '%'],
                    loc='lower right')
         plt.title('Reverse ARB Comparison')
-        plt.text(35000/2,ymax+0.015, str(CT.strftime('%Y-%m-%d %H:%M')), fontsize=12,
+        plt.text(35000 / 2, ymax + 0.015, str(CT.strftime('%Y-%m-%d %H:%M')), fontsize=12,
                  bbox=dict(facecolor='red', alpha=0.5), horizontalalignment='center',
                  verticalalignment='center')
         plt.xlabel('ZAR')
         plt.ylabel('Arb %')
         plt.ylim((ymin - 0.03, ymax + 0.02))
         plt.grid(which='both')
-        #plt.show()
+        # plt.show()
         plt.savefig('images/REV_ARB.png')
         plt.close()
 
@@ -129,58 +134,62 @@ def get_btc_rates():
     ice_btc = ice3x.fetch_ticker('BTC/ZAR')
     return luno_btc, bs_btc, ice_btc
 
-def calc_diff(AMT, BID, ASK, BASE, PEN1 = 0.9998, PEN2 = 0.99, ZAR_WITHDRAW_COST = 8.5, USD_DEP_COST = 7.5):
-    DIFF = PEN1 * PEN2* BID * (BASE * AMT * (1 / ASK) - USD_DEP_COST* (1 / ASK)) - ZAR_WITHDRAW_COST
-    return(DIFF)
 
-def calc_arb(AMT, BID, ASK, BASE, PEN1 = 0.9998, PEN2 = 0.99, ZAR_WITHDRAW_COST = 8.5, USD_DEP_COST = 7.5):
-    VAL = PEN1 * PEN2* BID * (BASE * AMT * (1 / ASK) - USD_DEP_COST* (1 / ASK)) - ZAR_WITHDRAW_COST
-    DIFF = VAL-AMT
+def calc_diff(AMT, BID, ASK, BASE, PEN1=0.9998, PEN2=0.99, ZAR_WITHDRAW_COST=8.5, USD_DEP_COST=7.5):
+    DIFF = PEN1 * PEN2 * BID * (BASE * AMT * (1 / ASK) - USD_DEP_COST * (1 / ASK)) - ZAR_WITHDRAW_COST
+    return (DIFF)
+
+
+def calc_arb(AMT, BID, ASK, BASE, PEN1=0.9998, PEN2=0.99, ZAR_WITHDRAW_COST=8.5, USD_DEP_COST=7.5):
+    VAL = PEN1 * PEN2 * BID * (BASE * AMT * (1 / ASK) - USD_DEP_COST * (1 / ASK)) - ZAR_WITHDRAW_COST
+    DIFF = VAL - AMT
     try:
-        ARB = DIFF/AMT
+        ARB = DIFF / AMT
     except:
         ARB = -1000
-    return(ARB)
+    return (ARB)
 
-def calc_rev_arb(ASK, BID, AMT = 10000.00, BASE = 12.00, PEN = 0.99):
-    base_dollars = AMT/BASE
-    bought = AMT*(1/ASK)*BID*PEN*PEN*PEN
-    diff = bought-base_dollars
+
+def calc_rev_arb(ASK, BID, AMT=10000.00, BASE=12.00, PEN=0.99):
+    base_dollars = AMT / BASE
+    bought = AMT * (1 / ASK) * BID * PEN * PEN * PEN
+    diff = bought - base_dollars
     try:
-        rev_arb = diff/base_dollars
+        rev_arb = diff / base_dollars
     except:
         rev_arb = -1
-    #print('BASE: {b}, DIFF: {d}, Bought: {a}'.format(b = base_dollars, d=diff, a=bought))
-    return(rev_arb)
+    # print('BASE: {b}, DIFF: {d}, Bought: {a}'.format(b = base_dollars, d=diff, a=bought))
+    return (rev_arb)
 
-def get_btc_arb(AMT = 30000, graph = False):
+
+def get_btc_arb(AMT=30000, graph=False):
     zarusd = get_zar_usd()
-    usdzar = 1/zarusd
+    usdzar = 1 / zarusd
     luno_btc, bs_btc, ice_btc = get_btc_rates()
     AMT_D = calc_diff(AMT, luno_btc['bid'], bs_btc['ask'], usdzar)
-    DIFF = AMT_D-AMT
-    ARB = DIFF/AMT
-    rev_arb = calc_rev_arb(ASK = luno_btc['ask'], BID =  bs_btc['bid'], BASE=zarusd)
+    DIFF = AMT_D - AMT
+    ARB = DIFF / AMT
+    rev_arb = calc_rev_arb(ASK=luno_btc['ask'], BID=bs_btc['bid'], BASE=zarusd)
     print('The ARB ratio is: {}'.format(ARB))
 
-    if(graph):
+    if (graph):
         AMT_VEC = range(0, 55000, 1000)
         AMT_D_VEC = [calc_diff(float(x), luno_btc['bid'], bs_btc['ask'], usdzar) for x in AMT_VEC]
         DIFF_VEC = np.array(AMT_D_VEC) - np.array(AMT_VEC)
         ARB_VEC = DIFF_VEC / AMT_VEC
 
-        #ARB2 = [calc_arb(x, BID = luno_btc['bid'], ASK=bs_btc['ask'], BASE=usdzar) for x in AMT_VEC]
+        # ARB2 = [calc_arb(x, BID = luno_btc['bid'], ASK=bs_btc['ask'], BASE=usdzar) for x in AMT_VEC]
 
         plt.plot(AMT_VEC, ARB_VEC)
         plt.ylim((-0.2, 0.2))
-        #plt.plot(AMT_VEC, ARB2)
-        #plt.savefig('images/ARB_BTC.png')
+        # plt.plot(AMT_VEC, ARB2)
+        # plt.savefig('images/ARB_BTC.png')
         plt.show()
     return ARB, zarusd, rev_arb
 
 
 def plt_last_24_hours(db):
-    #CT = datetime.datetime.now()
+    # CT = datetime.datetime.now()
 
     df = db.get_last_24_hours()
     df['time'] = pd.to_datetime(df['time'])
@@ -189,19 +198,22 @@ def plt_last_24_hours(db):
 
     plt.clf()
     plt.plot(df['time'], df['luno_btc_arb'])
-    plt.plot(df['time'], df['luno_btc_arb'],'p')
+    plt.plot(df['time'], df['luno_btc_arb'], 'p', label=None)
+
+    plt.plot(df['time'], df['luno_btc_revarb'])
+    plt.plot(df['time'], df['luno_btc_revarb'], 'p', label=None)
+
     plt.axhline(y=0, color='dimgray')
-    #plt.text(35000 / 2, ymax + 0.015, str(CT.strftime('%Y-%m-%d %H:%M')), fontsize=12,
+    # plt.text(35000 / 2, ymax + 0.015, str(CT.strftime('%Y-%m-%d %H:%M')), fontsize=12,
     #         bbox=dict(facecolor='red', alpha=0.5), horizontalalignment='center',
     #         verticalalignment='center')
 
     plt.xlabel('Time')
     plt.ylabel('ARB')
+    plt.legend(['ARB','REV ARB'])
     plt.grid(which='both')
 
-    #plt.show()
+    # plt.show()
     plt.savefig('images/LAST_24.png')
 
     plt.close()
-
-
