@@ -1,0 +1,22 @@
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org
+DEBUG:urllib3.connectionpool:https://api.telegram.org:443 "GET /bot436122122:AAH4yb5Byu1iRqrF4FGvw2L2bwgprcrh52I/getUpdates?timeout=100 HTTP/1.1" 409 143
+DEBUG:root:2018-04-20 16:58:35.522607 'result'
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org
+DEBUG:urllib3.connectionpool:https://api.telegram.org:443 "GET /bot436122122:AAH4yb5Byu1iRqrF4FGvw2L2bwgprcrh52I/getUpdates?timeout=100 HTTP/1.1" 200 315
+DEBUG:matplotlib.font_manager:findfont: Matching :family=sans-serif:style=normal:variant=normal:weight=normal:stretch=normal:size=10.0 to DejaVu Sans (u'/Users/chrischurch/anaconda/lib/python2.7/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans.ttf') with score of 0.050000
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org
+DEBUG:urllib3.connectionpool:https://api.telegram.org:443 "POST /bot436122122:AAH4yb5Byu1iRqrF4FGvw2L2bwgprcrh52I/sendPhoto HTTP/1.1" 200 556
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org
+DEBUG:urllib3.connectionpool:https://api.telegram.org:443 "GET /bot436122122:AAH4yb5Byu1iRqrF4FGvw2L2bwgprcrh52I/sendMessage?text=Good%20morning%20Chris,%20the%20current%20arb%20is:%203.003%25%20for%20ice3x_ltc_arb.%20The%20reverse%20arb%20is:%20-5.496%25%20for%20ice3x_btc_revarb.The%20current%20ZAR/USD%20FX%20rate%20is%2011.962.%20The%20data%20was%20stored%20into%20the%20DB%20at%2018:18%20on%202018-04-18.&chat_id=419194191 HTTP/1.1" 200 428
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org
+DEBUG:urllib3.connectionpool:https://api.telegram.org:443 "POST /bot436122122:AAH4yb5Byu1iRqrF4FGvw2L2bwgprcrh52I/sendPhoto HTTP/1.1" 200 555
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org
+DEBUG:urllib3.connectionpool:https://api.telegram.org:443 "GET /bot436122122:AAH4yb5Byu1iRqrF4FGvw2L2bwgprcrh52I/getUpdates?timeout=100&offset=213821438 HTTP/1.1" 200 316
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org
+DEBUG:urllib3.connectionpool:https://api.telegram.org:443 "POST /bot436122122:AAH4yb5Byu1iRqrF4FGvw2L2bwgprcrh52I/sendPhoto HTTP/1.1" 200 588
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org
+DEBUG:urllib3.connectionpool:https://api.telegram.org:443 "GET /bot436122122:AAH4yb5Byu1iRqrF4FGvw2L2bwgprcrh52I/getUpdates?timeout=100&offset=213821439 HTTP/1.1" 200 316
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org
+DEBUG:urllib3.connectionpool:https://api.telegram.org:443 "GET /bot436122122:AAH4yb5Byu1iRqrF4FGvw2L2bwgprcrh52I/sendMessage?text=Current%20ARB%20opportunity%20is%203.003%25%20for%20ice3x_ltc_arb,%20with%20a%20rev%20arb%20opportunity%20of%20-5.496%25%20for%20ice3x_btc_revarb.%20The%20current%20ZAR/USD%20exchange%20is%2011.962.%20The%20data%20was%20recorded%20at%2018:18%20on%202018-04-18.&chat_id=419194191 HTTP/1.1" 200 417
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): api.telegram.org

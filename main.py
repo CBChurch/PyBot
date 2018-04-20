@@ -8,18 +8,21 @@ import socket
 import logging
 from src.dbhelper import DBHelper
 import src.arb as src_arb
+import datetime
 
 #Initialise project
 init.initialise_project()
-logging.basicConfig(filename='/mnt/FLASH/logs/PyBot.log',level=logging.DEBUG)
+
 
 MachineName = socket.gethostname()
 if MachineName == 'raspberrypi':
     RaspPi = True
     db_directory = '/mnt/FLASH/db/'
+    logging.basicConfig(filename='/mnt/FLASH/logs/PyBot.log', level=logging.DEBUG)
 else:
     RaspPi = False
     db_directory = 'data/'
+    logging.basicConfig(filename='PyBot.log', level=logging.DEBUG)
 db = DBHelper("PyBot_DB.sqlite",db_directory)
 
 #Collect configuration items
@@ -51,17 +54,20 @@ def main():
             RunBot = src_bot.bot_responses(updates, URL, token, db)
             start_time = src_bot.check_arb(tdiff, start_time, base_chat_id, URL, db)
             morningMessage = src_bot.good_morning(morningMessage, base_chat_id, URL, token, db)
-            time.sleep(2)
             #RunBot = False
             try_count = 0
         except Exception as e:
-            logging.debug(str(e))
+            CT = datetime.datetime.now()
+            logging.debug(str(CT)+ ' ' + str(e))
             try_count += 1
             print updates
             print("Bot has failed {n} times".format(n=try_count))
-            if try_count >= 10:
+            if try_count >= 100:
                 src_bot.send_message("Bot failed 10 times in a row", chat_id=base_chat_id, URL=URL)
                 RunBot = False
+            else:
+                time.sleep(3*60)
+        time.sleep(5)
 
 
 #Run program

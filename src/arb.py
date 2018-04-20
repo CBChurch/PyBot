@@ -7,7 +7,6 @@ import numpy as np
 import pandas as pd
 from time import sleep as sleep
 import datetime
-import matplotlib.dates as mdates
 
 def get_zar_usd():
     c = CurrencyRates()
@@ -40,6 +39,7 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
     bitstamp_rates = get_ticker_rates(bitstamp, bitstamp_tickers)
     ice3x_rates = get_ticker_rates(ice3x, ice3x_tickers)
 
+
     luno_btc_arb = calc_arb(AMT, luno_rates[0]['bid'], bitstamp_rates[0]['ask'], usdzar)
 
     ice3x_btc_arb = calc_arb(AMT, ice3x_rates[0]['last'], bitstamp_rates[0]['ask'], usdzar)
@@ -51,6 +51,7 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
 
     #print('The ARB ratio is: {}'.format(luno_btc_arb))
     #print luno_btc_arb, ice3x_btc_arb, ice3x_ltc_arb, luno_btc_revarb, ice3x_btc_revarb, ice3x_ltc_revarb
+
 
     if plt_results:
         AMT_VEC = range(0, 35000, 100)

@@ -9,8 +9,7 @@ import dateutil.parser as dt_parser
 def handle_func(msg, bot, token):
     chat_id = msg['chat']['id']
     command = msg['text']
-    print(chat_id)
-    print 'Got command: %s' % command
+    print("Got command '{c}' from chat '{ch}'".format(c = command, ch = chat_id))
 
     if command == '/arb':
         bot.sendMessage(chat_id, str(np.round(src_arb.get_btc_arb()*100,3)))
@@ -25,7 +24,6 @@ def sendImage(chat_id, image_path, token):
     data = {'chat_id' : chat_id}
     r= requests.post(url, files=files, data=data)
     r.close()
-    #print(r.status_code, r.reason, r.content)
     pass
 
 def get_url(url):
@@ -73,7 +71,7 @@ def bot_responses(updates, URL, token, db):
     if len(updates["result"]) > 0:
         message_text = updates["result"][0]["message"]["text"]
         chat_id = updates["result"][0]["message"]["from"]["id"]
-        print 'Got command: %s' % message_text
+        print("Got command '{c}' from chat '{ch}'".format(c=message_text, ch=chat_id))
         if message_text == '/stop':
             RunBot = False
             updates["result"][0]["message"]["text"] = "Stopped"
@@ -172,7 +170,7 @@ def good_morning(morning_message, base_chat_id, URL, token, db):
         morning_message = True
     if CT <= MorningTime and morning_message == True:
         morning_message = False
-        print 'Reset morning message flag.'
+        print('Reset morning message flag')
     return morning_message
 
 def build_keyboard(items):
