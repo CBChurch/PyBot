@@ -189,28 +189,35 @@ def get_btc_arb(AMT=30000, graph=False):
 
 
 def plt_last_24_hours(db):
-    # CT = datetime.datetime.now()
+    CT = datetime.datetime.now()
 
     df = db.get_last_24_hours()
     df['time'] = pd.to_datetime(df['time'])
     df['time'] = df['time'].apply(lambda x: datetime.datetime.time(x))
     df = df.sort_values(by=['time'])
+    minx = df['time'].min()
+    maxx = df['time'].max()
+
+    midx = datetime.time(hour=minx.hour + (maxx.hour-minx.hour)/2,minute = minx.minute + (maxx.minute-minx.minute)/2 )
+
+    miny = df[['luno_btc_arb','luno_btc_revarb']].min().min()
+    maxy = df[['luno_btc_arb', 'luno_btc_revarb']].max().max()
 
     plt.clf()
-    plt.plot(df['time'], df['luno_btc_arb'])
+    arbplt, = plt.plot(df['time'], df['luno_btc_arb'])
     plt.plot(df['time'], df['luno_btc_arb'], 'p', label=None)
 
-    plt.plot(df['time'], df['luno_btc_revarb'])
+    revarbplt, = plt.plot(df['time'], df['luno_btc_revarb'])
     plt.plot(df['time'], df['luno_btc_revarb'], 'p', label=None)
 
     plt.axhline(y=0, color='dimgray')
-    # plt.text(35000 / 2, ymax + 0.015, str(CT.strftime('%Y-%m-%d %H:%M')), fontsize=12,
-    #         bbox=dict(facecolor='red', alpha=0.5), horizontalalignment='center',
-    #         verticalalignment='center')
-
+    plt.text(midx, maxy + 0.012, str(CT.strftime('%Y-%m-%d %H:%M')), fontsize=12,
+             bbox=dict(facecolor='red', alpha=0.5), horizontalalignment='center',
+             verticalalignment='center')
+    plt.ylim((miny - 0.025, maxy + 0.025))
     plt.xlabel('Time')
     plt.ylabel('ARB')
-    plt.legend(['ARB','REV ARB'])
+    plt.legend([arbplt, revarbplt],['ARB','REV ARB'])
     plt.grid(which='both')
 
     # plt.show()

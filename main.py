@@ -66,7 +66,7 @@ def main():
                 src_bot.send_message("Bot failed 10 times in a row", chat_id=base_chat_id, URL=URL)
                 RunBot = False
             else:
-                time.sleep(3*60)
+                time.sleep(1)
         time.sleep(5)
 
 
