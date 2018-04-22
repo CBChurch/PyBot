@@ -158,7 +158,6 @@ def calc_rev_arb(ASK, BID, AMT=10000.00, BASE=12.00, PEN=0.99):
         rev_arb = diff / base_dollars
     except:
         rev_arb = -1
-    # print('BASE: {b}, DIFF: {d}, Bought: {a}'.format(b = base_dollars, d=diff, a=bought))
     return (rev_arb)
 
 

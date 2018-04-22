@@ -9,6 +9,7 @@ import logging
 from src.dbhelper import DBHelper
 import src.arb as src_arb
 import datetime
+import gc
 
 #Initialise project
 init.initialise_project()
@@ -39,6 +40,7 @@ def main():
     start_time = datetime.datetime.now()
     RunBot = True
     morningMessage = False
+    src_bot.check_arb(start_time-start_time, start_time, base_chat_id, URL, db, runNow=True)
 
     db.setup()
 
@@ -54,7 +56,7 @@ def main():
             RunBot = src_bot.bot_responses(updates, URL, token, db)
             start_time = src_bot.check_arb(tdiff, start_time, base_chat_id, URL, db)
             morningMessage = src_bot.good_morning(morningMessage, base_chat_id, URL, token, db)
-            #RunBot = False
+            gc.collect()
             try_count = 0
         except Exception as e:
             CT = datetime.datetime.now()
@@ -62,11 +64,12 @@ def main():
             try_count += 1
             print updates
             print("Bot has failed {n} times".format(n=try_count))
+            gc.collect()
             if try_count >= 100:
-                src_bot.send_message("Bot failed 10 times in a row", chat_id=base_chat_id, URL=URL)
+                src_bot.send_message("Bot failed 100 times in a row", chat_id=base_chat_id, URL=URL)
                 RunBot = False
             else:
-                time.sleep(1)
+                time.sleep(3*60)
         time.sleep(5)
 
 
