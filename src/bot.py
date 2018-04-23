@@ -19,9 +19,7 @@ def handle_func(msg, bot, token):
         sendImage(chat_id, 'images/ARB_BTC.png', token)
     pass
 
-def sendImage(chat_id, image_path, token):
-    s = requests.session()
-    s.keep_alive = False
+def sendImage(chat_id, image_path, token, s):
     url = "https://api.telegram.org/bot{t}/sendPhoto".format(t = token);
     files = {'photo': open(image_path, 'rb')}
     data = {'chat_id' : chat_id}
@@ -30,42 +28,38 @@ def sendImage(chat_id, image_path, token):
     s.close()
     pass
 
-def get_url(url):
-    s = requests.session()
-    s.keep_alive = False
+def get_url(url, s):
     response = s.get(url)
-    #response = requests.get(url)
     content = response.content.decode("utf8")
     response.close()
-    s.close()
     return content
 
-def get_json_from_url(url):
-    content = get_url(url)
+def get_json_from_url(url, s):
+    content = get_url(url, s)
     js = json.loads(content)
     return js
 
-def get_updates(URL, offset=None, to = 100):
+def get_updates(URL, s, offset=None, to = 100):
     url = URL + "getUpdates?timeout={t}".format(t=to)
     if offset:
         url += "&offset={}".format(offset)
-    js = get_json_from_url(url)
+    js = get_json_from_url(url, s)
     return js
 
-def send_message(text, chat_id, URL, reply_markup = None):
+def send_message(text, chat_id, URL, s, reply_markup = None):
     text = furl(text)
     url = URL + "sendMessage?text={}&chat_id={}".format(text, chat_id)
     if reply_markup:
         url += "&reply_markup={}".format(reply_markup)
-    get_url(url)
+    get_url(url, s)
     pass
 
-def echo_all(updates, URL):
+def echo_all(updates, URL, s):
     for update in updates["result"]:
         try:
             text = update["message"]["text"]
             chat = update["message"]["chat"]["id"]
-            send_message(text, chat, URL)
+            send_message(text, chat, URL, s)
         except Exception as e:
             print(e)
 
@@ -75,7 +69,7 @@ def get_last_update_id(updates):
         update_ids.append(int(update["update_id"]))
     return max(update_ids)
 
-def bot_responses(updates, URL, token, db):
+def bot_responses(updates, URL, token, db, s, triggerFlag):
     RunBot = True
     if len(updates["result"]) > 0:
         message_text = updates["result"][0]["message"]["text"]
@@ -84,26 +78,24 @@ def bot_responses(updates, URL, token, db):
         if message_text == '/stop':
             RunBot = False
             updates["result"][0]["message"]["text"] = "Stopped"
-            send_message("Shutting down bot...", chat_id, URL)
+            send_message("Shutting down bot...", chat_id, URL, s)
             print("Shutting down bot...")
             pass
-        if message_text == '/arb':
-            #arbval, zarusd, rev_arb = arb.get_btc_arb()
-            #arbval = np.round(arbval, 5) * 100
-            #send_message("Current arb is {a}%".format(a=arbval), chat_id, URL)
+        if message_text == '/resetTrigger':
+            triggerFlag = True
             pass
         if message_text == '/arbplot':
             #arb.get_btc_arb(graph=True)
-            sendImage(chat_id, 'images/ARB.png', token)
+            sendImage(chat_id, 'images/ARB.png', token, s)
             pass
         if message_text == '/rarbplot':
             #arb.get_btc_arb(graph=True)
-            sendImage(chat_id, 'images/REV_ARB.png', token)
+            sendImage(chat_id, 'images/REV_ARB.png', token, s)
             pass
 
         if message_text == '/plot24':
             src_arb.plt_last_24_hours(db)
-            sendImage(chat_id, 'images/LAST_24.png', token)
+            sendImage(chat_id, 'images/LAST_24.png', token, s)
             pass
 
         if message_text == '/checkdb':
@@ -120,11 +112,11 @@ def bot_responses(updates, URL, token, db):
             send_message("Current ARB opportunity is {a}% for {p}, with a rev arb opportunity of {r}% for {rp}. The current ZAR/USD exchange "
                   "is {e}. The data was recorded at {t} on {dt}.".format(a = arb, p = arb_prod, rp = revarb_prod, r = revarb, \
                                                                       e = zarusd, t = t.time().strftime('%H:%M'), dt = t.date()),\
-                         chat_id, URL)
+                         chat_id, URL, s)
             pass
-    return RunBot
+    return RunBot, triggerFlag
 
-def check_arb(tdiff, start_time, base_chat_id, URL, db, runNow = False):
+def check_arb(tdiff, start_time, base_chat_id, URL, db, s, triggerFlag = True, runNow = False):
     CT = datetime.datetime.now()
     if (tdiff.seconds > 60 or runNow):
         #arbval, zarusd, revarb = np.round(arb.get_btc_arb(), 5)
@@ -140,18 +132,20 @@ def check_arb(tdiff, start_time, base_chat_id, URL, db, runNow = False):
         arbval = np.max([luno_btc_arb, ice3x_btc_arb, ice3x_ltc_arb])
         revarb = np.max([luno_btc_revarb, ice3x_btc_revarb, ice3x_ltc_revarb])
         print("{t} - Checking ARB, current val: {a}%. Reverse arb: {r}%".format(t = CT.strftime('%Y-%m-%d %H:%M'), a = arbval*100, r = revarb*100))
-        if arbval*100 >= 5.00:
+        if arbval*100 >= 5.00 and triggerFlag:
             print("ARB is greater than 5%")
-            send_message("ARB is greater than 5%, current arb is {a}%".format(a=arbval), base_chat_id, URL)
-        if revarb*100 >= 5.00:
+            send_message("ARB is greater than 5%, current arb is {a}%".format(a=arbval), base_chat_id, URL, s)
+            triggerFlag = False
+        if revarb*100 >= 5.00  and triggerFlag:
             print("Reverse ARB is greater than 5%")
-            send_message("Reverse ARB is greater than 5%, current arb is {a}%".format(a=revarb), base_chat_id, URL)
+            send_message("Reverse ARB is greater than 5%, current arb is {a}%".format(a=revarb), base_chat_id, URL, s)
+            triggerFlag = False
         start_time = datetime.datetime.now()
         db.add_arb(start_time, zarusd, luno_btc_arb, ice3x_btc_arb, ice3x_ltc_arb, luno_btc_revarb, ice3x_btc_revarb, ice3x_ltc_revarb)
 
-    return start_time
+    return start_time, triggerFlag
 
-def good_morning(morning_message, base_chat_id, URL, token, db):
+def good_morning(morning_message, base_chat_id, URL, token, db, s):
     CT = datetime.datetime.now()
     MorningTime = CT.replace(hour=7, minute=30, second=0)
     if morning_message == False and CT >= MorningTime:
@@ -170,11 +164,11 @@ def good_morning(morning_message, base_chat_id, URL, token, db):
         send_message("Good morning Chris, the current arb is: {a}% for {p}. The reverse arb is: {r}% for {rp}."
                      "The current ZAR/USD FX rate is {fx}. The data was stored into the DB at {t} on {dt}."
                      .format(a=arb, p = arb_prod, r = revarb, rp = revarb_prod, fx=zarusd,
-                             t=t.time().strftime('%H:%M'), dt=t.date()), base_chat_id, URL)
+                             t=t.time().strftime('%H:%M'), dt=t.date()), base_chat_id, URL, s)
         if arb > 0:
-            sendImage(base_chat_id, 'images/ARB.png', token)
+            sendImage(base_chat_id, 'images/ARB.png', token, s)
         if revarb > 0:
-            sendImage(base_chat_id, 'images/REV_ARB.png', token)
+            sendImage(base_chat_id, 'images/REV_ARB.png', token, s)
         print("It is later than {mt} and we have sent the morning message.".format(mt=MorningTime.strftime("%Hh%M")))
         morning_message = True
     if CT <= MorningTime and morning_message == True:
