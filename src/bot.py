@@ -39,7 +39,7 @@ def get_url(url, s):
             r.content
             r.close()
         s.close()
-
+    gc.collect()
     return content
 
 def get_json_from_url(url, s):
