@@ -6,6 +6,7 @@ import json
 import furl.furl as furl
 import dateutil.parser as dt_parser
 import gc
+import contextlib
 
 def handle_func(msg, bot, token):
     chat_id = msg['chat']['id']
@@ -23,15 +24,20 @@ def sendImage(chat_id, image_path, token, s):
     url = "https://api.telegram.org/bot{t}/sendPhoto".format(t = token);
     files = {'photo': open(image_path, 'rb')}
     data = {'chat_id' : chat_id}
-    r= s.post(url, files=files, data=data)
-    r.close()
-    s.close()
+    with s as sesh:
+        s.post(url, files=files, data=data)
+        s.close
     pass
 
 def get_url(url, s):
-    response = s.get(url)
-    content = response.content.decode("utf8")
-    response.close()
+    with s as sesh:
+        #response = sesh.get(url, stream = False, verify = False)
+        #if this fails perhaps wrap the next section in another 'with'
+        response = sesh.get(url, stream=False)
+        content = str(response.content.decode("utf8"))
+        response.content
+        response.close
+
     return content
 
 def get_json_from_url(url, s):
