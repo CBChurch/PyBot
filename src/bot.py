@@ -25,8 +25,8 @@ def sendImage(chat_id, image_path, token, s):
     files = {'photo': open(image_path, 'rb')}
     data = {'chat_id' : chat_id}
     with s as sesh:
-        s.post(url, files=files, data=data)
-        s.close
+        sesh.post(url, files=files, data=data)
+        sesh.close()
     pass
 
 def get_url(url, s):
@@ -34,9 +34,11 @@ def get_url(url, s):
         #response = sesh.get(url, stream = False, verify = False)
         #if this fails perhaps wrap the next section in another 'with'
         response = sesh.get(url, stream=False)
-        content = str(response.content.decode("utf8"))
-        response.content
-        response.close
+        with response as r:
+            content = str(r.content.decode("utf8"))
+            r.content
+            r.close()
+        s.close()
 
     return content
 
