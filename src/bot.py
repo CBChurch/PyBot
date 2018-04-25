@@ -24,21 +24,15 @@ def sendImage(chat_id, image_path, token, s):
     url = "https://api.telegram.org/bot{t}/sendPhoto".format(t = token);
     files = {'photo': open(image_path, 'rb')}
     data = {'chat_id' : chat_id}
-    with s as sesh:
+    with contextlib.closing(s) as sesh:
         sesh.post(url, files=files, data=data)
         sesh.close()
     pass
 
 def get_url(url, s):
-    with s as sesh:
-        #response = sesh.get(url, stream = False, verify = False)
-        #if this fails perhaps wrap the next section in another 'with'
-        response = sesh.get(url, stream=False)
-        with response as r:
+    with contextlib.closing(s) as sesh:
+        with contextlib.closing(sesh.get(url, stream=False)) as r:
             content = str(r.content.decode("utf8"))
-            r.content
-            r.close()
-        s.close()
     gc.collect()
     return content
 
