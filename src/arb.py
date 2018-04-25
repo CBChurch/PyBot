@@ -1,35 +1,33 @@
 from forex_python.converter import CurrencyRates
 import ccxt
 import matplotlib
-
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from time import sleep as sleep
 import datetime
+import contextlib
 
 
 def get_zar_usd():
-    c = CurrencyRates()
-    return (c.get_rate('USD', 'ZAR'))
+    with contextlib.closing(CurrencyRates()) as c:
+        CR = c.get_rate('USD', 'ZAR')
+    return (CR)
 
 
 def get_ticker_rates(ex=ccxt.bitstamp(), tickers=np.array(['BTC/USD', 'LTC/USD'])):
     rates = []
     for ticker in tickers:
-        rate = ex.fetch_ticker(ticker)
-        rates.append(rate)
-        sleep(2)
+        with contextlib.closing(ticker) as t:
+            rate = ex.fetch_ticker(t)
+            rates.append(rate)
+            sleep(2)
     return rates
 
 
 def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
     CT = datetime.datetime.now()
-
-    luno = ccxt.luno()
-    bitstamp = ccxt.bitstamp()
-    ice3x = ccxt.ice3x()
 
     zarusd = get_zar_usd()
     usdzar = 1 / zarusd
@@ -38,9 +36,12 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
     bitstamp_tickers = np.array(['BTC/USD', 'LTC/USD'])
     ice3x_tickers = np.array(['BTC/ZAR', 'LTC/ZAR'])
 
-    luno_rates = get_ticker_rates(luno, luno_tickers)
-    bitstamp_rates = get_ticker_rates(bitstamp, bitstamp_tickers)
-    ice3x_rates = get_ticker_rates(ice3x, ice3x_tickers)
+    with contextlib.closing(ccxt.luno()) as luno:
+        luno_rates = get_ticker_rates(luno, luno_tickers)
+    with contextlib.closing(ccxt.bitstamp()) as bitstamp:
+        bitstamp_rates = get_ticker_rates(bitstamp, bitstamp_tickers)
+    with contextlib.closing(ccxt.ice3x()) as ice3x:
+        ice3x_rates = get_ticker_rates(ice3x, ice3x_tickers)
 
     luno_btc_arb = calc_arb(AMT, luno_rates[0]['bid'], bitstamp_rates[0]['ask'], usdzar)
 
