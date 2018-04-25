@@ -11,7 +11,7 @@ import contextlib
 
 
 def get_zar_usd():
-    with contextlib.closing(CurrencyRates()) as c:
+    with CurrencyRates() as c:
         CR = c.get_rate('USD', 'ZAR')
     return (CR)
 
