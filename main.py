@@ -1,6 +1,9 @@
 #Import libraries
 import ConfigParser
 import time
+
+from ccxt import ice3x
+
 import src.bot as src_bot
 import src.init as init
 import datetime
@@ -11,6 +14,7 @@ import src.arb as src_arb
 import datetime
 import gc
 import requests
+import ccxt
 
 #Initialise project
 init.initialise_project()
@@ -44,7 +48,12 @@ def main():
     morningMessage = False
     sesh = requests.session()
 
-    src_bot.check_arb(start_time-start_time, start_time, base_chat_id, URL, db, runNow=True, s = sesh)
+    # ccxt
+    luno = ccxt.luno()
+    bitstamp = ccxt.bitstamp()
+    ice3x = ccxt.ice3x()
+
+    src_bot.check_arb(start_time-start_time, start_time, base_chat_id, URL, db, runNow=True, s = sesh, bitstamp = bitstamp, luno =  luno, ice3x =  ice3x)
 
     db.setup()
 
@@ -60,7 +69,7 @@ def main():
 
                 tdiff = datetime.datetime.now() - start_time
                 RunBot, triggerFlag = src_bot.bot_responses(updates, URL, token, db, s = bot_session, triggerFlag = triggerFlag)
-                start_time, triggerFlag = src_bot.check_arb(tdiff, start_time, base_chat_id, URL, db, s = bot_session, triggerFlag = triggerFlag)
+                start_time, triggerFlag = src_bot.check_arb(tdiff, start_time, base_chat_id, URL, db, s = bot_session, bitstamp = bitstamp, luno =  luno, ice3x =  ice3x, triggerFlag = triggerFlag)
                 morningMessage = src_bot.good_morning(morningMessage, base_chat_id, URL, token, db, s = bot_session)
                 gc.collect()
                 try_count = 0

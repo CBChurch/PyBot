@@ -7,6 +7,7 @@ import furl.furl as furl
 import dateutil.parser as dt_parser
 import gc
 import contextlib
+import urllib3
 
 def handle_func(msg, bot, token):
     chat_id = msg['chat']['id']
@@ -118,11 +119,11 @@ def bot_responses(updates, URL, token, db, s, triggerFlag):
             pass
     return RunBot, triggerFlag
 
-def check_arb(tdiff, start_time, base_chat_id, URL, db, s, triggerFlag = True, runNow = False):
+def check_arb(tdiff, start_time, base_chat_id, URL, db, s, bitstamp, luno, ice3x, triggerFlag = True, runNow = False):
     CT = datetime.datetime.now()
     if (tdiff.seconds > 60 or runNow):
         #arbval, zarusd, revarb = np.round(arb.get_btc_arb(), 5)
-        vals = src_arb.get_crypto_arb(plt_rev_arb=True, plt_results=True)
+        vals = src_arb.get_crypto_arb(bitstamp, luno, ice3x, plt_rev_arb=True, plt_results=True)
 
         luno_btc_arb = vals[0]
         ice3x_btc_arb = vals[1]

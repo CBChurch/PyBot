@@ -11,22 +11,21 @@ import contextlib
 
 
 def get_zar_usd():
-    with CurrencyRates() as c:
-        CR = c.get_rate('USD', 'ZAR')
+    CR = CurrencyRates().get_rate('USD', 'ZAR')
     return (CR)
 
 
 def get_ticker_rates(ex=ccxt.bitstamp(), tickers=np.array(['BTC/USD', 'LTC/USD'])):
     rates = []
     for ticker in tickers:
-        with contextlib.closing(ticker) as t:
-            rate = ex.fetch_ticker(t)
-            rates.append(rate)
-            sleep(2)
+        rate =ex.fetch_ticker(ticker)
+        rates.append(rate.copy())
+        rate.clear()
+        sleep(2)
     return rates
 
 
-def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
+def get_crypto_arb(bitstamp, luno, ice3x, AMT=30000,  plt_results=False, plt_rev_arb=False):
     CT = datetime.datetime.now()
 
     zarusd = get_zar_usd()
@@ -36,12 +35,13 @@ def get_crypto_arb(AMT=30000, plt_results=False, plt_rev_arb=False):
     bitstamp_tickers = np.array(['BTC/USD', 'LTC/USD'])
     ice3x_tickers = np.array(['BTC/ZAR', 'LTC/ZAR'])
 
-    with contextlib.closing(ccxt.luno()) as luno:
-        luno_rates = get_ticker_rates(luno, luno_tickers)
-    with contextlib.closing(ccxt.bitstamp()) as bitstamp:
-        bitstamp_rates = get_ticker_rates(bitstamp, bitstamp_tickers)
-    with contextlib.closing(ccxt.ice3x()) as ice3x:
-        ice3x_rates = get_ticker_rates(ice3x, ice3x_tickers)
+    #luno = ccxt.luno()
+    #bitstamp = ccxt.bitstamp()
+    #ice3x = ccxt.ice3x()
+
+    luno_rates = get_ticker_rates(luno, luno_tickers)
+    bitstamp_rates = get_ticker_rates(bitstamp, bitstamp_tickers)
+    ice3x_rates = get_ticker_rates(ice3x, ice3x_tickers)
 
     luno_btc_arb = calc_arb(AMT, luno_rates[0]['bid'], bitstamp_rates[0]['ask'], usdzar)
 
